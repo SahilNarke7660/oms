@@ -1,0 +1,37 @@
+package rules;
+
+import com.example.order_service.model.Order;
+import com.example.order_service.model.OrderValidationResult;
+
+// ── RULE 1: Quantity limit ────────────────────────────────────────
+rule "Reject order if quantity exceeds 10"
+    when
+        $order : Order(quantity > 10)
+        $result : OrderValidationResult()
+    then
+        $result.setValid(false);
+        $result.setMessage("Order rejected: quantity cannot exceed 10 items.");
+        System.out.println("Rule fired: quantity > 10");
+end
+
+// ── RULE 2: Laptop stock limit ────────────────────────────────────
+rule "Reject Laptop order if quantity exceeds 2"
+    when
+        $order : Order(product == "Laptop", quantity > 2)
+        $result : OrderValidationResult()
+    then
+        $result.setValid(false);
+        $result.setMessage("Order rejected: maximum 2 Laptops allowed per order.");
+        System.out.println("Rule fired: Laptop quantity > 2");
+end
+
+// ── RULE 3: Blacklisted user ──────────────────────────────────────
+rule "Reject order from blacklisted user"
+    when
+        $order : Order(userId == 2L)  // userId 2 is blacklisted
+        $result : OrderValidationResult()
+    then
+        $result.setValid(false);
+        $result.setMessage("Order rejected: user is blacklisted.");
+        System.out.println("Rule fired: blacklisted user " + $order.getUserId());
+end
